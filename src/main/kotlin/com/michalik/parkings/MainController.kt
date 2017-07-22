@@ -25,10 +25,26 @@ class MainController {
         return list
     }
 
-    @RequestMapping(path = arrayOf("/incidents"), method = arrayOf(RequestMethod.DELETE))
-    fun deleteAll() = incidentRepo.deleteAll()
+    @GetMapping("incident/{id}")
+    fun getIncidentById(@PathVariable id : String) : Incident? = incidentRepo.findOne(id)
 
-    @RequestMapping(path = arrayOf("/incidents"), method = arrayOf(RequestMethod.GET))
+    @GetMapping("parking/{id}")
+    fun getParkingById(@PathVariable id : String) : Parking? = parkingRepo.findOne(id)
+
+    @PutMapping("parking/{id}")
+    fun editParking(@PathVariable id: String, @RequestBody editedParking: Parking) : Parking{
+        var parking = parkingRepo.findOne(id)
+        parking=editedParking
+        return parkingRepo.save(parking)
+    }
+
+    @DeleteMapping("/incident")
+    fun deleteAllIncidents() = incidentRepo.deleteAll()
+
+    @DeleteMapping("/incident/{id}")
+    fun deleteIncident(@PathVariable id: String) = incidentRepo.delete(id)
+
+    @GetMapping("/incidents")
     fun getIncidentsByKind(@RequestParam(value = "kind", defaultValue = "OTHER") kind: IncidentKind): MutableList<Incident> = incidentRepo.findIncidentsByKind(kind)
 
     @RequestMapping(path = arrayOf("/incident"), method = arrayOf(RequestMethod.GET))
@@ -43,7 +59,7 @@ class MainController {
     @RequestMapping(path = arrayOf("/incident/kind"), method = arrayOf(RequestMethod.GET))
     fun getIncidentKinds() = IncidentKind.values()
 
-    @RequestMapping(path = arrayOf("/incidents/parking"), method = arrayOf(RequestMethod.GET))
-    fun getLastIncidentsInParking(@RequestParam(value = "id") id: String) = incidentRepo.findIncidentsByParkingId(id)
+    @RequestMapping(path = arrayOf("/incidents/{id}"), method = arrayOf(RequestMethod.GET))
+    fun getLastIncidentsInParking(@PathVariable("id") id: String) = incidentRepo.findIncidentsByParkingId(id)
 
 }
