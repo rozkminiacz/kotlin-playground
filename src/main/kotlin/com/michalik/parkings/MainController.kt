@@ -18,6 +18,14 @@ class MainController {
     @Autowired
     lateinit var incidentRepo: IncidentRepo
 
+
+    /**
+     * Parking CRUD
+     */
+
+    @RequestMapping(path = arrayOf("/parking"), method = arrayOf(RequestMethod.POST))
+    fun createParking(@RequestBody parking: Parking): Parking = parkingRepo.save(parking)
+
     @RequestMapping(path = arrayOf("/parking"), method = arrayOf(RequestMethod.GET))
     fun getParkings(): MutableList<Parking>? {
         val list = parkingRepo.findAll()
@@ -25,11 +33,13 @@ class MainController {
         return list
     }
 
-    @GetMapping("incident/{id}")
-    fun getIncidentById(@PathVariable id : String) : Incident? = incidentRepo.findOne(id)
-
     @GetMapping("parking/{id}")
-    fun getParkingById(@PathVariable id : String) : Parking? = parkingRepo.findOne(id)
+    fun getParkingById(@PathVariable id : String) : Parking?{
+        val count = incidentRepo.findIncidentsByParkingId(id).count()
+        val parking = parkingRepo.findOne(id)
+        parking.incidents=count
+        return parking
+    }
 
     @PutMapping("parking/{id}")
     fun editParking(@PathVariable id: String, @RequestBody editedParking: Parking) : Parking{
@@ -38,11 +48,24 @@ class MainController {
         return parkingRepo.save(parking)
     }
 
-    @DeleteMapping("/incident")
-    fun deleteAllIncidents() = incidentRepo.deleteAll()
+    @DeleteMapping("parking/{id}")
+    fun deleteParking(@PathVariable id: String) = parkingRepo.delete(id)
 
-    @DeleteMapping("/incident/{id}")
-    fun deleteIncident(@PathVariable id: String) = incidentRepo.delete(id)
+    @DeleteMapping("parking")
+    fun deleteAllParking() = parkingRepo.deleteAll()
+
+    /**
+     * Incidents CRUD
+     */
+
+    @RequestMapping(path = arrayOf("/incident"), method = arrayOf(RequestMethod.POST))
+    fun createIncident(@RequestBody incident: Incident): Incident = incidentRepo.save(incident)
+
+    @RequestMapping(path = arrayOf("/incident/kind"), method = arrayOf(RequestMethod.GET))
+    fun getIncidentKinds() = IncidentKind.values()
+
+    @GetMapping("incident/{id}")
+    fun getIncidentById(@PathVariable id : String) : Incident? = incidentRepo.findOne(id)
 
     @GetMapping("/incidents")
     fun getIncidentsByKind(@RequestParam(value = "kind", defaultValue = "OTHER") kind: IncidentKind): MutableList<Incident> = incidentRepo.findIncidentsByKind(kind)
@@ -50,14 +73,11 @@ class MainController {
     @RequestMapping(path = arrayOf("/incident"), method = arrayOf(RequestMethod.GET))
     fun getAllIncidents(): MutableList<Incident> = incidentRepo.findAll()
 
-    @RequestMapping(path = arrayOf("/parking"), method = arrayOf(RequestMethod.POST))
-    fun createParking(@RequestBody parking: Parking): Parking = parkingRepo.save(parking)
+    @DeleteMapping("/incident")
+    fun deleteAllIncidents() = incidentRepo.deleteAll()
 
-    @RequestMapping(path = arrayOf("/incident"), method = arrayOf(RequestMethod.POST))
-    fun createIncident(@RequestBody incident: Incident): Incident = incidentRepo.save(incident)
-
-    @RequestMapping(path = arrayOf("/incident/kind"), method = arrayOf(RequestMethod.GET))
-    fun getIncidentKinds() = IncidentKind.values()
+    @DeleteMapping("/incident/{id}")
+    fun deleteIncident(@PathVariable id: String) = incidentRepo.delete(id)
 
     @RequestMapping(path = arrayOf("/incidents/{id}"), method = arrayOf(RequestMethod.GET))
     fun getLastIncidentsInParking(@PathVariable("id") id: String) = incidentRepo.findIncidentsByParkingId(id)
