@@ -3,7 +3,7 @@ package com.michalik.parkings.parking
 /**
  * Created by michalik on 21.07.17
  */
-class Parking {
+class Parking { //todo create area for parking (at least 3 latlng)
 
     var lat: Double = 0.0
     var lon: Double = 0.0
